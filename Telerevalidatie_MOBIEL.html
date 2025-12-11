@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Telerevalidatie Tool</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar {
+            background: white;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar h1 {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 15px auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 15px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 0.95em;
+            opacity: 0.95;
+            line-height: 1.4;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .feature {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .feature h3 {
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .feature p {
+            font-size: 12px;
+            color: #666;
+            margin: 0;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            border-bottom: 2px solid #e0e0e0;
+            overflow-x: auto;
+            padding: 0 20px;
+            margin: 15px -20px 0 -20px;
+            padding-left: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .tab-btn:active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px 0 30px 0;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+            margin-top: 0;
+            font-weight: 700;
+        }
+
+        .step {
+            background: white;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .step h3 {
+            color: #667eea;
+            font-size: 14px;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+
+        .step p {
+            font-size: 13px;
+            margin: 0 0 12px 0;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px 10px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+            active: active;
+        }
+
+        .btn:active {
+            background: #667eea;
+            color: white;
+            transform: scale(0.98);
+        }
+
+        .btn:touch {
+            opacity: 0.7;
+        }
+
+        .result {
+            margin-top: 12px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .result.warning {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+        }
+
+        .result.danger {
+            background: #f8d7da;
+            border-left: 4px solid #721c24;
+            color: #721c24;
+        }
+
+        .result h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .result p {
+            margin: 5px 0;
+            font-size: 12px;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .checkbox-group {
+            margin: 10px 0;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid #e0e0e0;
+            font-size: 13px;
+            touch-action: manipulation;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .score-display {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 15px 0;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .card {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 12px;
+        }
+
+        .card h3 {
+            color: #667eea;
+            font-size: 14px;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+
+        .card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .card li {
+            font-size: 12px;
+            padding: 6px 0;
+            border-bottom: 1px solid #e0e0e0;
+            color: #555;
+        }
+
+        .card li:last-child {
+            border-bottom: none;
+        }
+
+        .card li::before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f0f0f0;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 15px;
+            text-align: center;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .cta-section h2 {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .cta-section p {
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .cta-btn {
+            background: white;
+            color: #667eea;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+
+        .cta-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        footer {
+            background: #f0f0f0;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 11px;
+            margin-top: 30px;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 480px) {
+            .navbar h1 {
+                font-size: 16px;
+            }
+
+            .hero {
+                padding: 20px 15px;
+            }
+
+            .hero h1 {
+                font-size: 1.5em;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .tabs {
+                padding: 0 15px;
+                margin: 15px -15px 0 -15px;
+                padding-left: 15px;
+            }
+
+            .tab-btn {
+                font-size: 11px;
+                padding: 10px 8px;
+            }
+
+            .btn {
+                font-size: 12px;
+                padding: 10px 8px;
+            }
+        }
+
+        /* Tap highlight removal */
+        a, button, input {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Safe area for notched phones */
+        @supports (padding: max(0px)) {
+            body {
+                padding-left: max(0px, env(safe-area-inset-left));
+                padding-right: max(0px, env(safe-area-inset-right));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🏥 Telerevalidatie Tool</h1>
+    </div>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Decisietool</h1>
+            <p>Is je patiënt geschikt voor telerevalidatie?</p>
+        </div>
+
+        <div class="content">
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Snelle Screening</h3>
+                    <p>4 stappen</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <h3>Evidence-Based</h3>
+                    <p>6 RCT's</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">✅</div>
+                    <h3>Automatisch</h3>
+                    <p>Directe uitslag</p>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab(event, 'tool')">🌳 Tool</button>
+                <button class="tab-btn" onclick="switchTab(event, 'assessment')">✅ Check</button>
+                <button class="tab-btn" onclick="switchTab(event, 'mcid')">📊 MCID</button>
+                <button class="tab-btn" onclick="switchTab(event, 'guide')">📖 Gids</button>
+            </div>
+
+            <div id="tool" class="tab-content active">
+                <h2>🌳 Interactieve Beslisboom</h2>
+
+                <div class="step">
+                    <h3>Stap 1: Screening</h3>
+                    <p><strong>Is patiënt ≥18 jaar met tendomyogene MSK-klacht?</strong></p>
+                    <div class="buttons">
+                        <button class="btn" onclick="toolStep1('ja')">✓ Ja</button>
+                        <button class="btn" onclick="toolStep1('nee')">✗ Nee</button>
+                    </div>
+                    <div id="toolResult1" class="result"></div>
+                </div>
+
+                <div class="step" id="toolStep2" style="display:none;">
+                    <h3>Stap 2: Veiligheid</h3>
+                    <p><strong>Valrisico / instabiliteit / contra-indicaties?</strong></p>
+                    <div class="buttons">
+                        <button class="btn" onclick="toolStep2('ja')">Ja</button>
+                        <button class="btn" onclick="toolStep2('nee')">Nee</button>
+                    </div>
+                    <div id="toolResult2" class="result"></div>
+                </div>
+
+                <div class="step" id="toolStep3" style="display:none;">
+                    <h3>Stap 3: Digitaal</h3>
+                    <p><strong>Apparatuur / internet / vaardigheden?</strong></p>
+                    <div class="buttons">
+                        <button class="btn" onclick="toolStep3('ja')">✓ Ja</button>
+                        <button class="btn" onclick="toolStep3('nee')">✗ Nee</button>
+                    </div>
+                    <div id="toolResult3" class="result"></div>
+                </div>
+
+                <div class="step" id="toolStep4" style="display:none;">
+                    <h3>Stap 4: Motivatie</h3>
+                    <p><strong>Gemotiveerd voor zelfstandig oefenen?</strong></p>
+                    <div class="buttons">
+                        <button class="btn" onclick="toolStep4('nee')">✗ Nee</button>
+                        <button class="btn" onclick="toolStep4('deels')">~ Deels</button>
+                        <button class="btn" onclick="toolStep4('ja')">✓ Ja</button>
+                    </div>
+                    <div id="toolResult4" class="result"></div>
+                </div>
+
+                <div id="toolFinal" class="result"></div>
+                <button class="btn" onclick="resetTool()" style="background: #dc3545; color: white; border-color: #dc3545; display:none; margin-top: 15px; width: 100%;" id="toolResetBtn">🔄 Opnieuw</button>
+            </div>
+
+            <div id="assessment" class="tab-content">
+                <h2>✅ 16-Punts Assessment</h2>
+
+                <h3 style="color: #667eea; font-size: 13px; margin-top: 15px; margin-bottom: 10px;">🔒 Veiligheid</h3>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" onchange="updateScore()"> Geen valrisico</label>
+                    <label><input type="checkbox" onchange="updateScore()"> Geen instabiliteit</label>
+                    <label><input type="checkbox" onchange="updateScore()"> Geen contra-indicaties</label>
+                    <label><input type="checkbox" onchange="updateScore()"> Veilig zelfstandig</label>
+                </div>
+
+                <h3 style="color: #667eea; font-size: 13px; margin-top: 15px; margin-bottom: 10px;">💻 Digitaal</h3>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" onchange="updateScore()"> Apparatuur</label>
+                    <label><input type="checkbox" onchange="updateScore()"> Internet</label>
+                    <label><input type="checkbox" onchange="updateScore()"> Vaardigheden</label>
+                </div>
+
+                <h3 style="color: #667eea; font-size: 13px; margin-top: 15px; margin-bottom: 10px;">👤 Patiënt</h3>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" onchange="updateScore()"> ≥18 jaar</label>
+                    <label><input type="checkbox" onchange="updateScore()"> Taalvaardigheid</label>
+                    <label><input type="checkbox" onchange="updateScore()"> Geen cognit. beperkingen</label>
+                    <label><input type="checkbox" onchange="updateScore()"> Zelfmanagement</label>
+                </div>
+
+                <h3 style="color: #667eea; font-size: 13px; margin-top: 15px; margin-bottom: 10px;">🏥 Klacht</h3>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" onchange="updateScore()"> Tendomyogeen</label>
+                    <label><input type="checkbox" onchange="updateScore()"> Hulpvraag past</label>
+                    <label><input type="checkbox" onchange="updateScore()"> Geen complexe comorbid.</label>
+                </div>
+
+                <h3 style="color: #667eea; font-size: 13px; margin-top: 15px; margin-bottom: 10px;">💪 Motivatie</h3>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" onchange="updateScore()"> Gemotiveerd</label>
+                    <label><input type="checkbox" onchange="updateScore()"> 3-4x/week commitment</label>
+                </div>
+
+                <div class="score-display" id="scoreDisplay">Score: 0 / 16</div>
+                <div id="scoreResult"></div>
+            </div>
+
+            <div id="mcid" class="tab-content">
+                <h2>📊 MCID Drempels</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Instrument</th>
+                            <th>MCID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>VAS (pijn)</td>
+                            <td>≥15-20mm</td>
+                        </tr>
+                        <tr>
+                            <td>NPRS (pijn)</td>
+                            <td>≥2 of 30%</td>
+                        </tr>
+                        <tr>
+                            <td>QuickDASH</td>
+                            <td>≥10pt</td>
+                        </tr>
+                        <tr>
+                            <td>NDI</td>
+                            <td>≥5-10pt</td>
+                        </tr>
+                        <tr>
+                            <td>PSFS</td>
+                            <td>≥2-3pt</td>
+                        </tr>
+                        <tr>
+                            <td>Kujala</td>
+                            <td>≥10pt</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box">
+                    <strong>💡 Tip:</strong> Evalueer na 6 weken of MCID is bereikt. Monitor pijn (NPRS) en functie (PSFS/QuickDASH) regelmatig.
+                </div>
+            </div>
+
+            <div id="guide" class="tab-content">
+                <h2>📖 Gebruiksaanwijzing</h2>
+
+                <div class="card">
+                    <h3>1️⃣ Screening</h3>
+                    <p>Volwassen (≥18j) + tendomyogeen? → Ja = volgende stap</p>
+                </div>
+
+                <div class="card">
+                    <h3>2️⃣ Veiligheid</h3>
+                    <p>Valrisico? → Ja = Face-to-Face voorkeur</p>
+                </div>
+
+                <div class="card">
+                    <h3>3️⃣ Digitaal</h3>
+                    <p>Apparatuur + internet + skills? → Nee = Face-to-Face</p>
+                </div>
+
+                <div class="card">
+                    <h3>4️⃣ Motivatie</h3>
+                    <p>Gemotiveerd? → Bepaalt eindaanbeveling</p>
+                </div>
+
+                <div class="info-box">
+                    <strong>✅ Eindaanbevelingen:</strong>
+                    <ul style="margin-left: 15px; margin-top: 8px; font-size: 12px;">
+                        <li>Alle JA's → Telerevalidatie</li>
+                        <li>Gemengd → Blended Care</li>
+                        <li>Veel NEE's → Face-to-Face</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <h2>Klaar?</h2>
+                <p>Start nu met het screening van jouw patiënt</p>
+                <button class="cta-btn" onclick="switchTab(event, 'tool')">Start Tool</button>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Telerevalidatie Decisietool</strong></p>
+            <p>Kane Mulder & Ivar Bosma | Fysiotherapie HvA | 2025</p>
+            <p>Gebaseerd op 6 RCT's (PEDro 6-9/10)</p>
+        </footer>
+    </div>
+
+    <script>
+        function switchTab(evt, tabName) {
+            var tabcontent = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            var tablinks = document.getElementsByClassName("tab-btn");
+            for (var i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+            window.scrollTo(0, 0);
+        }
+
+        function toolStep1(answer) {
+            const result = document.getElementById('toolResult1');
+            if (answer === 'ja') {
+                result.className = 'result show success';
+                result.innerHTML = '<h3>✅ Volgende stap</h3><p>Patiënt voldoet aan criteria.</p>';
+                document.getElementById('toolStep2').style.display = 'block';
+            } else {
+                result.className = 'result show danger';
+                result.innerHTML = '<h3>❌ Niet geschikt</h3><p>Niet volwassen of geen tendomyogene klacht.</p>';
+                document.getElementById('toolResetBtn').style.display = 'block';
+            }
+        }
+
+        function toolStep2(answer) {
+            const result = document.getElementById('toolResult2');
+            if (answer === 'nee') {
+                result.className = 'result show success';
+                result.innerHTML = '<h3>✅ Volgende stap</h3><p>Geen veiligheidsrisico's.</p>';
+                document.getElementById('toolStep3').style.display = 'block';
+            } else {
+                result.className = 'result show danger';
+                result.innerHTML = '<h3>⚠️ Face-to-Face voorkeur</h3><p>Bij risico = directe supervisie.</p>';
+                document.getElementById('toolResetBtn').style.display = 'block';
+            }
+        }
+
+        function toolStep3(answer) {
+            const result = document.getElementById('toolResult3');
+            if (answer === 'ja') {
+                result.className = 'result show success';
+                result.innerHTML = '<h3>✅ Volgende stap</h3><p>Digitale middelen beschikbaar.</p>';
+                document.getElementById('toolStep4').style.display = 'block';
+            } else {
+                result.className = 'result show danger';
+                result.innerHTML = '<h3>⚠️ Face-to-Face voorkeur</h3><p>Onvoldoende digitale ondersteuning.</p>';
+                document.getElementById('toolResetBtn').style.display = 'block';
+            }
+        }
+
+        function toolStep4(answer) {
+            const finalDiv = document.getElementById('toolFinal');
+            if (answer === 'ja') {
+                finalDiv.innerHTML = '<h3 style="color: #28a745;">🎉 TELEREVALIDATIE</h3><p>Patiënt is uitstekend geschikt. Online platform + videoconsulten.</p>';
+                finalDiv.className = 'result show success';
+            } else if (answer === 'deels') {
+                finalDiv.innerHTML = '<h3 style="color: #17a2b8;">🔄 BLENDED CARE</h3><p>Mix online + face-to-face. KNGF aanbevolen.</p>';
+                finalDiv.className = 'result show warning';
+            } else {
+                finalDiv.innerHTML = '<h3 style="color: #721c24;">🏥 FACE-TO-FACE</h3><p>Wekelijkse sessies in praktijk.</p>';
+                finalDiv.className = 'result show danger';
+            }
+            document.getElementById('toolResetBtn').style.display = 'block';
+        }
+
+        function resetTool() {
+            document.getElementById('toolResult1').innerHTML = '';
+            document.getElementById('toolResult2').innerHTML = '';
+            document.getElementById('toolResult3').innerHTML = '';
+            document.getElementById('toolFinal').innerHTML = '';
+            document.getElementById('toolStep2').style.display = 'none';
+            document.getElementById('toolStep3').style.display = 'none';
+            document.getElementById('toolStep4').style.display = 'none';
+            document.getElementById('toolResetBtn').style.display = 'none';
+        }
+
+        function updateScore() {
+            const checked = document.querySelectorAll('#assessment input[type="checkbox"]:checked').length;
+            document.getElementById('scoreDisplay').textContent = `Score: ${checked} / 16`;
+
+            const scoreDiv = document.getElementById('scoreResult');
+            if (checked === 16) {
+                scoreDiv.innerHTML = '<div class="result show success"><h3>🌟 Zeer geschikt</h3><p>Volledige telerevalidatie aanbevolen.</p></div>';
+            } else if (checked >= 12) {
+                scoreDiv.innerHTML = '<div class="result show success"><h3>✅ Geschikt</h3><p>Telerevalidatie of blended.</p></div>';
+            } else if (checked >= 8) {
+                scoreDiv.innerHTML = '<div class="result show warning"><h3>🔄 Blended care</h3><p>Mix online + face-to-face aanbevolen.</p></div>';
+            } else if (checked > 0) {
+                scoreDiv.innerHTML = '<div class="result show danger"><h3>⚠️ Face-to-face</h3><p>Traditionele begeleiding voorkeur.</p></div>';
+            } else {
+                scoreDiv.innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>
